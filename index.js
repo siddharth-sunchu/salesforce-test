@@ -1,6 +1,4 @@
 const splitTextIntoArr = require('./utils/splitText');
-// const dependCommand = require('./commands/dependCommand');
-// const dependentGraph = new Map();
 const dependenciesGraph = new Map();
 const installPackages = new Set();
 
@@ -11,8 +9,7 @@ const checkCyclic = (currentPackage, dependentPackage) => {
             return true;
         }
         return false;
-    }
-
+    };
 
     return false;
 }
@@ -40,8 +37,6 @@ const dependCommand = (commands) => {
     const dependentUpon = commands[1];
     const dependentList = commands.slice(2, commands.length);
 
-    // console.log(`${commands[0]} ${dependentUpon} ${dependentList.join(' ')}`);
-
     const filterCyclic = removeCyclicPackages(dependentUpon, dependentList);
     const { cyclic, nonCyclic } = filterCyclic;
 
@@ -61,7 +56,6 @@ const dependCommand = (commands) => {
     cyclic.forEach((packageName) => {
         result += `${packageName} depends upon on ${dependentUpon}, ignoring command`;
         result += '\n';
-        // console.log(`${packageName} depends upon on ${dependentUpon}, ignoring command`);
     });
 
     nonCyclic.forEach((packageName) => {
@@ -88,19 +82,15 @@ const dependCommand = (commands) => {
 
 const installCommand = (commands) => {
     const installPackage = commands[1];
-    // console.log(`${commands[0]} ${installPackage}`);
     const installNodes = new Set();
     let result = '';
 
     const installPackagesDFS = (installPackage, check) => {
 
-        
-
         if(!installNodes.has(installPackage)) {
             installNodes.add(installPackage);
             if(installPackages.has(installPackage)) {
                 if(!check) {
-                    // console.log(`   ${installPackage} is already installed`);
                     result += `${installPackage} is already installed`;
                     result += '\n';
                 }
@@ -110,17 +100,11 @@ const installCommand = (commands) => {
                 if(dependenciesGraph.has(installPackage)) {
                     const packageInfo = dependenciesGraph.get(installPackage);
                         packageInfo.dependencies.forEach((package) => {
-                            // if(!installNodes.has(package)) {
-                                // installNodes.add(package);
-                                installPackagesDFS(package, true);
-                            // }
-    
+                            installPackagesDFS(package, true);
                     });
                 } 
         
                 installPackages.add(installPackage);
-                // console.log(`   ${installPackage} successfully installed`);
-                // result += `${installPackage} successfully installed`;
                 result += `Installing ${installPackage}`;
                 result += '\n';
         
@@ -138,11 +122,9 @@ const installCommand = (commands) => {
 const ListCommand = () => {
 
     let result = '';
-    // console.log('LIST');
     installPackages.forEach((installPackage) => {
         result += `${installPackage}`;
         result += '\n';
-        // console.log(`   ${installPackage}`);
     });
 
     return result;
@@ -151,8 +133,6 @@ const ListCommand = () => {
 const removeCommand = (packageName) => {
 
     let result = '';
-
-    // console.log(`REMOVE ${packageName}`);
     const visitedNodes = new Set();
 
     const dfsRemove = (package, check) => {
@@ -164,7 +144,6 @@ const removeCommand = (packageName) => {
     
                 if(graphObj.dependentUpon.size > 0) {
                     if(!check) {
-                        // console.log(`   ${package} is still needed`);
                         result += `${package} is still needed`;
                         result += '\n';
                     }
@@ -174,27 +153,20 @@ const removeCommand = (packageName) => {
                     dependenciesGraph.delete(package);
                     installPackages.delete(package);
                     if(check) {
-                        // console.log(`   ${package} is no longer needed`);
                         // result += `${package} is no longer needed`;
                         // result += '\n';
                     }
-                    // result += `${package} successfully removed`;
                     result += `Removing ${package}`;
                     result += '\n';
-                    // console.log(`   ${package} successfully removed`);
                     if(!check) {
-                        // graphObj.dependencies = new Set(Array.from(graphObj.dependencies).reverse())
                         graphObj.dependencies.forEach((eachDependencies) => {
-                            // if(!visitedNodes.has(eachDependencies)) {
                                 dfsRemove(eachDependencies, true);
-                            // }
                         });
                     }
     
                     
                 }
             } else {
-                // console.log(`   ${package}  is not installed`);
                 result += `${package}  is not installed`;
                 result += '\n';
             }
@@ -250,17 +222,11 @@ const functionData = (input) => {
 
         if(currentOperation == 'REMOVE') {
             const packageName = currentCommands[1];
-            // removeCommand(packageName);
             result += removeCommand(packageName);
         }  
     }
 
     return result;
-    // console.log(dependenciesGraph);
-    // console.log('installPackages => ', installPackages);
-
-
-
 };
 
 // let input = "22\n" +
